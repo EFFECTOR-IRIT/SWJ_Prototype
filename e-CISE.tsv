@@ -1,0 +1,14 @@
+subject_id	predicate_id	object_id	mapping_justification	subject_label	object_label
+ecise:Animal	owl:equivalentClass	soman:Animal	sempav_voc:ManualMappingCuration	sempav_voc:	animal
+ecise:CollectionPlan	skos:relatedMatch	prov:Plan	sempav_voc:ManualMappingCuration	CollectionPlan	Plan
+ecise:CrisisIncident	skos:narrowMatch	sosa:Observation	sempav_voc:ManualMappingCuration	CrisisIncident	Observation
+ecise:Location	owl:equivalentClass	prov:Location	sempav_voc:ManualMappingCuration	Location	Location
+ecise:Metadata	owl:equivalentClass	sweet:Metadata	sempav_voc:ManualMappingCuration	Metadata	metadata
+ecise:MeteoOceanographicCondition	rdfs:subClassOf	sosa:ObservableProperty	sempav_voc:ManualMappingCuration	MeteoOceanographicCondition	ObservableProperty
+ecise:Mission	rdfs:subClassOf	dul:Event	sempav_voc:ManualMappingCuration	Mission	Event
+ecise:Object	skos:broadMatch	dul:PhysicalArtifact	sempav_voc:ManualMappingCuration	Object	PhysicalArtifact
+ecise:Operation	rdfs:subClassOf	dul:Event	sempav_voc:ManualMappingCuration	Operation	Event
+ecise:Report	rdfs:subClassOf	foaf:Document	sempav_voc:ManualMappingCuration	Report	Document
+ecise:Sensor	owl:equivalentClass	sosa:Sensor	sempav_voc:ManualMappingCuration	Sensor	Sensor
+ecise:SensorMetadata	rdfs:subClassOf	sweet:Metadata	sempav_voc:ManualMappingCuration	SensorMetadata	metadata
+ecise:Vehicle	owl:equivalentClass	envo:Vehicle	sempav_voc:ManualMappingCuration	Vehicle	vehicle

@@ -1,0 +1,186 @@
+[PrefixDeclaration]
+owl: http://www.w3.org/2002/07/owl#
+rdf: http://www.w3.org/1999/02/22-rdf-syntax-ns#
+rdfs: http://www.w3.org/2000/01/rdf-schema#
+ecise: https://w3id.org/ecise#
+
+[MappingDeclaration] @collection [[
+
+mappingId   Vessel
+target		ecise:{mmsi} a ecise:Vessel ; ecise:mmsi {mmsi}^^xsd:long ; ecise:name {name}^^xsd:string ; ecise:length {length}^^xsd:int .
+source      SELECT
+            "mmsi" AS mmsi,
+            "name" AS name,
+            "length" AS length
+            FROM vessels
+
+mappingId   ObjectLocation
+target      ecise:{objectlocation} a ecise:ObjectLocation ; ecise:hasObjectLocationLocation ecise:{locationId} ; ecise:hasObjectLocationObject ecise:{vesselId} ; ecise:hasObjectLocationPeriodOfTime ecise:{period} .
+source      SELECT
+            CONCAT(vl."id", v."mmsi", vl."date", vl."time") AS objectlocation,
+            v."mmsi" AS vesselId,
+            CONCAT(vl."date", vl."time") AS period,
+            CONCAT(v."mmsi", vl."date", vl."time") AS locationId
+            FROM vessels v, vessel_locations vl
+            WHERE v.id = vl.vessel_id
+
+mappingId   VesselLocationPeriod
+target      ecise:{period} a ecise:Period ; ecise:startdate {date} ; ecise:starttime {time} .
+source      SELECT
+            CONCAT("date", "time") AS period,
+            "date" AS date,
+            "time" AS time
+            FROM vessel_locations
+
+mappingId   LocationForVessel
+target		ecise:{location} a ecise:Location ; ecise:hasLocationGeometry ecise:{geometry} .
+source      SELECT
+            CONCAT(v."mmsi", vl."date", vl."time") AS location,
+            CONCAT(vl."lat", vl."lon") AS geometry
+            FROM vessels v, vessel_locations vl
+            WHERE v.id = vl.vessel_id
+
+mappingId   GeometryForVessel
+target      ecise:{geometry} a ecise:PointGeometry ; ecise:latitude {latitude}^^xsd:double ; ecise:longitude {longitude}^^xsd:double .
+source      SELECT
+            CONCAT("lat", "lon") AS geometry,
+            CAST("lat" AS DOUBLE PRECISION)  AS latitude,
+            CAST("lon" AS DOUBLE PRECISION)  AS longitude
+            FROM vessel_locations
+
+mappingId   Anomaly
+target		ecise:{tag} a ecise:MaritimeAnomaly ; ecise:hasEntityIdentifier ecise:{tag} ; ecise:hasMaritimeAnomalyMaritimeAnomalyType ecise:{anomalyType} .
+source      SELECT
+            "tag" AS tag,
+            "type" AS anomalyType
+            FROM anomalies
+
+mappingId   UniqueIdentifier
+target		ecise:{uid} a ecise:UniqueIdentifier ; ecise:uuid {uid} .
+source      SELECT
+            "tag" AS uid
+            FROM anomalies
+
+mappingId   AnomalyAgent
+target		ecise:{agentev} a ecise:AgentEvent ; ecise:hasAgentEventAgent ecise:{agent} ; ecise:hasAgentEventEvent ecise:{event} .
+source      SELECT
+            CONCAT(ag."tag", an."tag") AS agentev,
+            ag."tag" AS agent,
+            an."tag" AS event
+            FROM anomalies an, agents ag
+            WHERE an."agent_id" = ag."id"
+
+mappingId   AnomalyLocation
+target		ecise:{eventloc} a ecise:EventLocation ; ecise:hasEventLocationLocation ecise:{location} ; ecise:hasEventLocationEvent ecise:{event}  ; ecise:hasEventLocationDateTime ecise:{period} .
+source      SELECT
+            CONCAT("id", "tag") AS eventloc,
+            CONCAT("date", "time") AS period,
+            CONCAT("tag", "date", "time") AS location,
+            "tag" AS event
+            FROM anomalies
+
+mappingId   AnomalyLocationPeriod
+target      ecise:{period} a ecise:Period ; ecise:startdate {date} ; ecise:starttime {time} .
+source      SELECT
+            CONCAT("date", "time") AS period,
+            "date" AS date,
+            "time" AS time
+            FROM anomalies
+
+mappingId   LocationForAnomaly
+target		ecise:{location} a ecise:Location ; ecise:hasLocationGeometry ecise:{geometry} .
+source      SELECT
+            CONCAT("tag", "date", "time") AS location,
+            CONCAT("lat", "lon") AS geometry
+            FROM anomalies
+
+mappingId   GeometryForAnomaly
+target      ecise:{geometry} a ecise:PointGeometry ; ecise:latitude {latitude}^^xsd:double ; ecise:longitude {longitude}^^xsd:double .
+source      SELECT
+            CONCAT("lat", "lon") AS geometry,
+            CAST("lat" AS DOUBLE PRECISION)  AS latitude,
+            CAST("lat" AS DOUBLE PRECISION)  AS longitude
+            FROM anomalies
+
+mappingId   VesselAnomaly
+target      ecise:{vesselAnomaly} a ecise:ObjectEvent ; ecise:hasObjectEventEvent ecise:{event} ; ecise:hasObjectEventObject ecise:{object} .
+source      SELECT
+            CONCAT("id_anomaly", "id_vessel") AS vesselAnomaly,
+            "id_anomaly" AS event,
+            "id_vessel" AS object
+            FROM vessel_anomalies
+
+mappingId   Agent
+target	    ecise:{agentId} a ecise:Agent ; ecise:contactinformation {tag}^^xsd:string .
+source      SELECT
+            "id" AS agentId,
+            "tag" AS tag
+            FROM agents
+
+mappingId   RFI
+target      ecise:{tag} a ecise:RequestForInformation ; ecise:hasEntityIdentifier ecise:{tag} ; ecise:hasRequester ecise:{requesterId} ; ecise:subject {subject}^^xsd:string.
+source      SELECT
+            "tag" AS tag,
+            "agent_id" AS requesterId,
+            "vessel_id" AS subject
+            FROM rfi
+
+mappingId   Incident
+target      ecise:{tag} a ecise:MaritimeSafetyIncident ; ecise:hasEntityIdentifier ecise:{tag} ; ecise:hasMaritimeSafetyIncidentMaritimeSafetyIncidentType ecise:{type} ; ecise:hasEventOccurrencePeriod ecise:{period} .
+source      SELECT
+            "tag" AS tag,
+            "type" AS type,
+            CONCAT("date", "time") AS period
+            FROM incidents
+
+mappingId   IncidentLocationPeriod
+target      ecise:{period} a ecise:Period ; ecise:startdate {date} ; ecise:starttime {time} .
+source      SELECT
+            CONCAT("date", "time") AS period,
+            "date" AS date,
+            "time" AS time
+            FROM incidents
+
+mappingId   VesselInIncident
+target      ecise:{objinc} a ecise:SubjectObject ; ecise:hasSubjectObjectObject ecise:{vessel} ; ecise:hasSubjectObjectInIncident ecise:{incident} .
+source      SELECT
+            CONCAT(i."tag", v."mmsi") AS objinc,
+            i."tag" AS incident,
+            v."mmsi" AS vessel
+            FROM incidents i, vessels v, vessel_incidents vi
+            WHERE v."id" = vi."vessel_id" AND i."id" = vi."incident_id"
+
+mappingId   VesselDocument
+target      ecise:{vessel} a ecise:Vessel ; ecise:hasObjectDocument ecise:{doc} .
+source      SELECT
+            d."title" AS doc,
+            v."mmsi" AS vessel
+            FROM documents d, vessels v
+            WHERE v.id = d.vessel_id
+
+mappingId   DocumentType
+target      ecise:{doc} a ecise:CargoDocument ; ecise:hasCargoDocumentDocumentType ecise:{type} .
+source      SELECT
+            "title" AS doc,
+            "type" AS type
+            FROM documents
+
+mappingId   AnomalyRisk
+target      ecise:{risk} a ecise:Risk ; ecise:hasRiskRiskType ecise:{type} ; ecise:hasRiskEvent ecise:{anomaly} .
+source      SELECT
+            ar."tag" AS risk,
+            ar."type" AS type,
+            a."tag" AS anomaly
+            FROM anomaly_risks ar, anomalies a
+            WHERE ar."anomaly_id" = a."id"
+
+mappingId   DocRisk
+target      ecise:{risk} a ecise:Risk ; ecise:hasRiskRiskType ecise:{type} ; ecise:hasRiskDocument ecise:{document} .
+source      SELECT
+            dr."tag" AS risk,
+            dr."type" AS type,
+            d."title" AS document
+            FROM doc_risks dr, documents d
+            WHERE dr."doc_id" = d."id"
+
+]]

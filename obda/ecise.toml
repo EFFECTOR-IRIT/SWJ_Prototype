@@ -1,0 +1,172 @@
+title="SWJ Prototype"
+
+[[tabGroups]]
+
+name="Use Case 1"
+
+[[tabGroups.tabs]]
+
+name="Vessel VESS_UC1"
+query="""
+prefix : <https://w3id.org/ecise#>
+SELECT ?vessel ?mmsi ?name ?length WHERE {
+  ?vessel a :Vessel .
+  ?vessel :mmsi "123456789"^^xsd:long .
+  ?vessel :mmsi ?mmsi .
+  ?vessel :name ?name .
+  ?vessel :length ?length
+} 
+
+"""
+
+[[tabGroups.tabs]]
+
+name="Anomaly by MAC2"
+query="""
+prefix : <https://w3id.org/ecise#>
+SELECT ?anomaly ?type ?date ?time ?lat ?lon WHERE {
+  ?el :hasEventLocationLocation ?loc .
+  ?el :hasEventLocationEvent ?anomaly .
+  ?anomaly :hasMaritimeAnomalyMaritimeAnomalyType ?type .
+  ?el :hasEventLocationDateTime ?period .
+  ?ae :hasAgentEventAgent :MAC2 .
+  ?ae :hasAgentEventEvent ?anomaly .
+  ?period :startdate ?date .
+  ?period :starttime ?time .
+  ?loc :hasLocationGeometry ?geom .
+  ?geom :latitude ?lat .
+  ?geom :longitude ?lon 
+}
+"""
+
+[[tabGroups.tabs]]
+
+name="VESS_UC1 locations"
+query="""
+prefix : <https://w3id.org/ecise#>
+SELECT ?loc ?lat ?lon ?date ?time WHERE {
+  ?ol :hasObjectLocationLocation ?loc .
+  ?ol :hasObjectLocationObject :123456789 .
+  ?ol :hasObjectLocationPeriodOfTime ?period .
+  ?period :startdate ?date .
+  ?period :starttime ?time .
+  ?loc :hasLocationGeometry ?geom .
+  ?geom :latitude ?lat .
+  ?geom :longitude ?lon 
+} ORDER BY ASC(?time)
+"""
+
+[[tabGroups.tabs]]
+
+name="Anomalies by MAC1"
+query="""
+prefix : <https://w3id.org/ecise#>
+SELECT ?anomaly ?type ?date ?time ?lat ?lon WHERE {
+  ?el :hasEventLocationLocation ?loc .
+  ?el :hasEventLocationEvent ?anomaly .
+  ?anomaly :hasMaritimeAnomalyMaritimeAnomalyType ?type .
+  ?el :hasEventLocationDateTime ?period .
+  ?ae :hasAgentEventAgent :MAC1 .
+  ?ae :hasAgentEventEvent ?anomaly .
+  ?period :startdate ?date .
+  ?period :starttime ?time .
+  ?loc :hasLocationGeometry ?geom .
+  ?geom :latitude ?lat .
+  ?geom :longitude ?lon 
+}
+"""
+
+[[tabGroups.tabs]]
+
+name="Incidents by MAC2"
+query="""
+prefix : <https://w3id.org/ecise#>
+
+SELECT ?incident ?type ?date ?time WHERE {
+  ?so :hasSubjectObjectObject :123456789 .
+  ?so :hasSubjectObjectInIncident ?incident .
+  ?incident :hasMaritimeSafetyIncidentMaritimeSafetyIncidentType ?type .
+  ?incident :hasEventOccurrencePeriod ?period .
+  ?period :startdate ?date .
+  ?period :starttime ?time 
+} 
+"""
+
+[[tabGroups]]
+
+name="Use Case 2"
+
+[[tabGroups.tabs]]
+
+name="Vessel VESS1_UC2 and VESS2_UC2"
+query="""
+prefix : <https://w3id.org/ecise#>
+SELECT ?vessel ?mmsi ?name ?length WHERE {
+  ?vessel a :Vessel .
+  ?vessel :mmsi ?mmsi .
+  ?vessel :name ?name .
+  ?vessel :length ?length .
+  FILTER(?mmsi = "123456789"^^xsd:long || ?mmsi = "234567891"^^xsd:long) .
+}
+"""
+
+[[tabGroups.tabs]]
+
+name="Imminent Collision anomaly"
+query="""
+prefix : <https://w3id.org/ecise#>
+SELECT ?anomaly ?type ?date ?time WHERE {
+  ?el :hasEventLocationLocation ?loc .
+  ?el :hasEventLocationEvent ?anomaly .
+  ?anomaly :hasMaritimeAnomalyMaritimeAnomalyType ?type .
+  ?el :hasEventLocationDateTime ?period .
+  ?period :startdate ?date .
+  ?period :starttime ?time .
+}
+"""
+
+[[tabGroups.tabs]]
+
+name="Collision risk"
+query="""
+prefix : <https://w3id.org/ecise#>
+SELECT ?risk ?type WHERE {
+  ?risk :hasRiskEvent <https://w3id.org/ecise#UC2_IC0> .
+  ?risk :hasRiskRiskType ?type .
+} 
+"""
+
+[[tabGroups.tabs]]
+name="Collision incident"
+query="""
+prefix : <https://w3id.org/ecise#>
+SELECT DISTINCT ?incident ?type ?date ?time WHERE {
+  ?so :hasSubjectObjectObject ?vessel .
+  ?so :hasSubjectObjectInIncident ?incident .
+  ?incident :hasMaritimeSafetyIncidentMaritimeSafetyIncidentType ?type .
+  ?incident :hasEventOccurrencePeriod ?period .
+  ?period :startdate ?date .
+  ?period :starttime ?time .
+  ?vessel :mmsi ?mmsi .
+  FILTER(?mmsi = "123456789"^^xsd:long || ?mmsi = "234567891"^^xsd:long)
+} 
+"""
+
+[[tabGroups.tabs]]
+name="VESS1 Cargo Document"
+query="""
+prefix : <https://w3id.org/ecise#>
+SELECT ?vessel ?document WHERE {
+  ?vessel :hasObjectDocument ?document .
+} 
+"""
+
+[[tabGroups.tabs]]
+name="Pollution and fire risks"
+query="""
+prefix : <https://w3id.org/ecise#>
+SELECT ?risk ?type ?document WHERE {
+  ?risk :hasRiskDocument <https://w3id.org/ecise#VESS1_UC2_CargoDoc> .
+  ?risk :hasRiskRiskType ?type .
+} 
+"""
